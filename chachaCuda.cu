@@ -494,8 +494,8 @@ __global__ void differential_bias_kernel(unsigned long long seed, int rounds, ui
 		alg.rounds(alt_state, rounds, startFromSecondRound);
 		if (addExtraHalfRound)
 		{
-			alg.halfrounds(state, 1, rounds, 1);
-			alg.halfrounds(alt_state, 1, rounds, 1);
+			alg.halfrounds(state, 1, rounds+1, 1);
+			alg.halfrounds(alt_state, 1, rounds+1, 1);
 		}
 
 		xor_array(state, state, alt_state, 16);
@@ -1965,11 +1965,8 @@ void search_until_find_significant_bias_for_chacha3andHalf_with_IDw14b6_starting
 	}
 }
 
-void test_new_pnb_attacks_chacha_7_back_3_bias_in_b5_3andhalf()
+void test_new_pnb_attacks_chacha_7_back_3_bias_in_b13_3andhalf()
 {
-	//Melhor resultado: Number of pnb for gamma = 0.350000: 108.
-	//bias_of_g = 0.000169 \varepsilon = 0.000000, data_complexity 75.518860, time_complexity 223.518860
-
 	uint32_t ODmask[16] = { 0 };
 	uint32_t ID[16] = { 0 };
 	uint64_t N;
@@ -1985,8 +1982,8 @@ void test_new_pnb_attacks_chacha_7_back_3_bias_in_b5_3andhalf()
 	N = 1;
 	N <<= 14;
 	ID[14] = (1 << 6);
-	uint32_t listOfWords[2] = { 5,10 };
-	uint32_t listOfBits[2] = { 7,0 };
+	uint32_t listOfWords[2] = { 13,2 };
+	uint32_t listOfBits[2] = { 8,0 };
 	set_list_of_bits(ODmask, listOfWords, listOfBits, 2);
 
 	N = 1;
@@ -1996,7 +1993,7 @@ void test_new_pnb_attacks_chacha_7_back_3_bias_in_b5_3andhalf()
 		printf("%f, ", neutrality_list[i]);
 		
 	double varepsilon_a = 0;
-	double varepsilon_d = 0.0000002489;
+	double varepsilon_d = 0.000003032;
 	N = 1;
 	N <<= 38;
 
@@ -2021,7 +2018,6 @@ void test_new_pnb_attacks_chacha_7_back_3_bias_in_b5_3andhalf()
 		printf("varepsilon_a = %f \\varepsilon = %f, data_complexity %f, time_complexity %f.\n", varepsilon_a, e, data_complexity, time_complexity);
 	}
 }
-
 
 
 int main()
@@ -2051,12 +2047,9 @@ int main()
 	//Section 5.1 (Differential biases)
 	//First test the bias available in page 16 of Maitra 2017 to check the correctness of the implementation. 
 	//The bias should be close to 0.0272.
-    search_until_find_significant_bias_maitra();  
+        search_until_find_significant_bias_maitra();  
 	search_until_find_significant_bias_for_chacha3andHalf_with_IDw14b6_starting_from_second_round(0,0);
-	search_until_find_significant_bias_for_chacha3andHalf_with_IDw14b6_starting_from_second_round(1,0);
-	search_until_find_significant_bias_for_chacha3andHalf_with_IDw14b6_starting_from_second_round(12,0);
 	search_until_find_significant_bias_for_chacha3andHalf_with_IDw14b6_starting_from_second_round(13,0);
-	search_until_find_significant_bias_for_chacha3andHalf_with_IDw14b6_starting_from_second_round(5,0);
 		
 	//Section 5.3 (Probabilistic Neutral Bits (PNB))
 	/*
@@ -2074,7 +2067,7 @@ int main()
 	Data complexity = 27
 	*/
 	test_aumasson_pnb_attack_chacha_7();
-	test_new_pnb_attacks_chacha_7_back_3_bias_in_b5_3andhalf();
+	test_new_pnb_attacks_chacha_7_back_3_bias_in_b13_3andhalf();
 
 	return 0;
 }
